@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsoap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="urn:sap-com:document:sap:rfc:functions" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" targetNamespace="urn:sap-com:document:sap:rfc:functions" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:documentation>
+    <sidl:sidl xmlns:sidl="http://www.sap.com/2007/03/sidl" />
+  </wsdl:documentation>
+  <wsp:UsingPolicy wsdl:required="true" />
+  <wsp:Policy wsu:Id="IF_IF_ZSD_CREATE_WEB_SO">
+    <sapsession:Session xmlns:sapsession="http://www.sap.com/webas/630/soap/features/session/">
+      <sapsession:enableSession>false</sapsession:enableSession>
+    </sapsession:Session>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="OP_IF_OP_ZSD_CREATE_WEB_SALES_ORDER">
+    <sapblock:enableBlocking xmlns:sapblock="http://www.sap.com/NW05/soap/features/blocking/">true</sapblock:enableBlocking>
+    <sapcomhnd:enableCommit xmlns:sapcomhnd="http://www.sap.com/NW05/soap/features/commit/">false</sapcomhnd:enableCommit>
+    <saptrhnw05:required xmlns:saptrhnw05="http://www.sap.com/NW05/soap/features/transaction/">no</saptrhnw05:required>
+    <saprmnw05:enableWSRM xmlns:saprmnw05="http://www.sap.com/NW05/soap/features/wsrm/">false</saprmnw05:enableWSRM>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="qualified" targetNamespace="urn:sap-com:document:sap:rfc:functions">
+      <xsd:simpleType name="char1">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="1" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char10">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="10" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char18">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="18" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char20">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="20" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char21">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="21" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char220">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="220" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char3">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="3" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char30">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="30" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char32">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="32" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char35">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="35" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char4">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="4" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char50">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="50" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char80">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="80" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="date10">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="10" />
+          <xsd:pattern value="\d\d\d\d-\d\d-\d\d" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="numeric3">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="3" />
+          <xsd:pattern value="\d*" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="numeric6">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="6" />
+          <xsd:pattern value="\d*" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="quantum15.3">
+        <xsd:restriction base="xsd:decimal">
+          <xsd:totalDigits value="15" />
+          <xsd:fractionDigits value="3" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="unit3">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="3" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:complexType name="BAPIRET2">
+        <xsd:sequence>
+          <xsd:element name="TYPE" type="tns:char1" />
+          <xsd:element name="ID" type="tns:char20" />
+          <xsd:element name="NUMBER" type="tns:numeric3" />
+          <xsd:element name="MESSAGE" type="tns:char220" />
+          <xsd:element name="LOG_NO" type="tns:char20" />
+          <xsd:element name="LOG_MSG_NO" type="tns:numeric6" />
+          <xsd:element name="MESSAGE_V1" type="tns:char50" />
+          <xsd:element name="MESSAGE_V2" type="tns:char50" />
+          <xsd:element name="MESSAGE_V3" type="tns:char50" />
+          <xsd:element name="MESSAGE_V4" type="tns:char50" />
+          <xsd:element name="PARAMETER" type="tns:char32" />
+          <xsd:element name="ROW" type="xsd:int" />
+          <xsd:element name="FIELD" type="tns:char30" />
+          <xsd:element name="SYSTEM" type="tns:char10" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ZSD_WEB_SO_HEADER_S">
+        <xsd:sequence>
+          <xsd:element name="BSTKD" type="tns:char35" />
+          <xsd:element name="BSTKD_E" type="tns:char35" />
+          <xsd:element name="TEMP" type="tns:char21" />
+          <xsd:element name="TRATY" type="tns:char4" />
+          <xsd:element name="KUNAG" type="tns:char10" />
+          <xsd:element name="SHIPFR" type="tns:char10" />
+          <xsd:element name="BSTDK" type="tns:date10" />
+          <xsd:element name="PICKUP" type="tns:char3" />
+          <xsd:element name="SHIPTO" type="tns:char10" />
+          <xsd:element name="VDATU" type="tns:date10" />
+          <xsd:element name="DELCO" type="tns:char3" />
+          <xsd:element name="DELIV_INSTR" type="tns:char80" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ZSD_WEB_SO_ITEM_S">
+        <xsd:sequence>
+          <xsd:element name="MATNR" type="tns:char18" />
+          <xsd:element name="KWMENG" type="tns:quantum15.3" />
+          <xsd:element name="MEINS" type="tns:unit3" />
+          <xsd:element name="NTGEW" type="tns:quantum15.3" />
+          <xsd:element name="BRGEW" type="tns:quantum15.3" />
+          <xsd:element name="VOLUM" type="tns:quantum15.3" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TABLE_OF_BAPIRET2">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="item" type="tns:BAPIRET2" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ZSD_WEB_SO_ITEM_TT">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="item" type="tns:ZSD_WEB_SO_ITEM_S" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ZSD_CREATE_WEB_SALES_ORDER">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ET_RETURN" type="tns:TABLE_OF_BAPIRET2" />
+            <xsd:element name="IS_SO_HEADER" type="tns:ZSD_WEB_SO_HEADER_S" />
+            <xsd:element name="IT_SO_ITEM" type="tns:ZSD_WEB_SO_ITEM_TT" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ZSD_CREATE_WEB_SALES_ORDERResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ET_RETURN" type="tns:TABLE_OF_BAPIRET2" />
+            <xsd:element name="IT_SO_ITEM" type="tns:ZSD_WEB_SO_ITEM_TT" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ZSD_CREATE_WEB_SALES_ORDER">
+    <wsdl:part name="parameters" element="tns:ZSD_CREATE_WEB_SALES_ORDER" />
+  </wsdl:message>
+  <wsdl:message name="ZSD_CREATE_WEB_SALES_ORDERResponse">
+    <wsdl:part name="parameter" element="tns:ZSD_CREATE_WEB_SALES_ORDERResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ZSD_CREATE_WEB_SO">
+    <wsdl:documentation>
+      <sapdoc:sapdoc xmlns:sapdoc="urn:sap:esi:documentation">
+        <sapdoc:docitem applicationComponent="SD" />
+      </sapdoc:sapdoc>
+    </wsdl:documentation>
+    <wsdl:operation name="ZSD_CREATE_WEB_SALES_ORDER">
+      <wsp:Policy>
+        <wsp:PolicyReference URI="#OP_IF_OP_ZSD_CREATE_WEB_SALES_ORDER" />
+      </wsp:Policy>
+      <wsdl:input message="tns:ZSD_CREATE_WEB_SALES_ORDER" />
+      <wsdl:output message="tns:ZSD_CREATE_WEB_SALES_ORDERResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>
