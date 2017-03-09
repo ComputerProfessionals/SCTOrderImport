@@ -9,7 +9,6 @@ namespace OrderImportClasses
     [Table("sct.ShippingRequestErrors")]
     public partial class ShippingRequestError
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ShippingRequestErrorID { get; set; }
 
         public string ErrorDetail { get; set; }

@@ -12,48 +12,77 @@ namespace OrderImportClasses
 {
     public class ProcessOrders
     {
-        public void Process()
+
+        string GetString(Object value)
         {
-            SRT_SCT db = new SRT_SCT();
+            if (value != null && value != DBNull.Value)
+                return value.ToString();
+            else
+                return "";
+        }
+
+        decimal GetDecimal(Object value)
+        {
+            if (value != null && value != DBNull.Value)
+                return (decimal)(value);
+            else
+                return 0;
+        }
+        public string Process()
+        {
+            string lsResult = "true";
+            int liDone = 0;      
 
             try
 
             {
-
-                foreach (ShippingRequestHeader h in (from p in db.ShippingRequestHeaders where p.ProcessedDate == null select p))
+                List<ShippingRequestHeader> headerList;
+                
+                using (SRT_SCT hdb = new SRT_SCT())
                 {
+                    headerList = (from p in hdb.ShippingRequestHeaders where p.ProcessedDate == null select p).ToList();
+                }
 
-                  //  ZSD_CREATE_WEB_SO SO;// = new SCTWS.ZSD_CREATE_WEB_SO();
-                  //  ZSD_CREATE_WEB_SALES_ORDERRequest req = new SCTWS.ZSD_CREATE_WEB_SALES_ORDERRequest();
+                foreach (ShippingRequestHeader h in headerList)
+                {
+                    liDone += 1;
 
-                   // req.ZSD_CREATE_WEB_SALES_ORDER = new ZSD_CREATE_WEB_SALES_ORDER();
+                    string lsMessage = "";                  
+
                     ZSD_CREATE_WEB_SALES_ORDER so = new ZSD_CREATE_WEB_SALES_ORDER();// req.ZSD_CREATE_WEB_SALES_ORDER;
-
+                    so.IS_SO_HEADER = new ZSD_WEB_SO_HEADER_S();
                    ZSD_WEB_SO_HEADER_S header = so.IS_SO_HEADER;
-                    header.BSTKD = h.CustomerPONum;
-                    header.BSTKD_E = h.ConsignmentRef;
-                    header.TEMP = h.TemperatureID;
-                    header.TRATY = h.MeansOfTransportID;
-                    header.KUNAG = h.CustomerAccountID;
-                    header.SHIPFR = h.PickupFromID;
-                    header.BSTDK = h.PickupDate.ToString("yyyy/mm/dd");
-                    header.PICKUP = h.PickupTime;
-                    header.SHIPTO = h.DeliverToID;
-                    header.VDATU = h.DeliveryDate.ToString("yyyy/mm/dd");
-                    header.DELCO = h.DeliveryTime;
-                    header.DELIV_INSTR = h.DeliveryInstructions;
+                    header.BSTKD = GetString(h.CustomerPONum) ;
+                    header.BSTKD_E = GetString(h.ConsignmentRef);
+                    header.TEMP = GetString(h.TemperatureID);
+                    header.TRATY = GetString(h.MeansOfTransportID);
+                    header.KUNAG = GetString(h.CustomerAccountID);
+                    header.SHIPFR = GetString(h.PickupFromID);
+                    header.BSTDK = GetString(h.PickupDate.ToString("yyyy/MM/dd"));
+                    header.PICKUP = GetString(h.PickupTime);
+                    header.SHIPTO = GetString(h.DeliverToID);
+                    header.VDATU = GetString(h.DeliveryDate.ToString("yyyy/MM/dd"));
+                    header.DELCO = GetString(h.DeliveryTime);
+                    header.DELIV_INSTR = GetString(h.DeliveryInstructions);
 
                     List<ZSD_WEB_SO_ITEM_S> items = new List<ZSD_WEB_SO_ITEM_S>();
 
-                    foreach (ShippingRequestDetail i in (from d in db.ShippingRequestDetails where d.ShipReqID == h.ShipReqID select d))
+                    List<ShippingRequestDetail> itemList;
+
+                    using (SRT_SCT hdb = new SRT_SCT())
+                    {
+                        itemList = (from p in hdb.ShippingRequestDetails where p.ShipReqID == h.ShipReqID select p).ToList();
+                    }
+
+                    foreach (ShippingRequestDetail i in itemList)
                     {
                         ZSD_WEB_SO_ITEM_S item = new ZSD_WEB_SO_ITEM_S();
-                        item.BRGEW = i.GrossWeight;
-                        item.KWMENG = i.Quantity;
-                        item.MATNR = i.MaterialNumber;
-                        item.MEINS = i.UnitOfMeasure;
-                        item.NTGEW = i.NetWeight;
-                        item.VOLUM = i.Volume;
+                        item.BRGEW = GetDecimal(i.GrossWeight);
+                        item.KWMENG = GetDecimal(i.Quantity);
+                        item.MATNR = GetString(i.MaterialNumber);
+                        item.MEINS = GetString(i.UnitOfMeasure);
+                        item.NTGEW = GetDecimal(i.NetWeight);
+                        item.VOLUM = GetDecimal(i.Volume);
                         items.Add(item);                                              
                     }
 
@@ -70,7 +99,7 @@ namespace OrderImportClasses
                     ZSD_CREATE_WEB_SOClient ws = new ZSD_CREATE_WEB_SOClient(httpBinding, endPointAddr);
 
                     string strUserName =  ConfigurationManager.AppSettings["SAPUserName"];
-                    string strPassword = "logis123";
+                    string strPassword = ConfigurationManager.AppSettings["SAPUserPassword"]; 
 
                   //  System.Net.NetworkCredential cred = new System.Net.NetworkCredential(strUserName, strPassword);                   
 
@@ -85,49 +114,111 @@ namespace OrderImportClasses
                                              
                     ZSD_CREATE_WEB_SALES_ORDERResponse ret = null;
 
-                    bool lbOK = false;                   
+                    bool lbOK = false;                                       
 
                     try
                     {
                         ret = ws.ZSD_CREATE_WEB_SALES_ORDER(so);
-                        if (ret != null && ret.ET_RETURN.Length > 2)
-                        {
-                            if (ret.ET_RETURN[2].TYPE.Equals("S", StringComparison.OrdinalIgnoreCase))
-                            {
-                                lbOK = true;
-                            }
-                            else 
-                            {
-                                string lsMessaage = ret.ET_RETURN[3].MESSAGE + " " + 
-                                    ret.ET_RETURN[3].MESSAGE_V1 +  " " + 
-                                    ret.ET_RETURN[3].MESSAGE_V2 + " " + 
-                                    ret.ET_RETURN[3].MESSAGE_V3 + " " + 
-                                    ret.ET_RETURN[3].MESSAGE_V4;
 
-                                Log.LogError("Failed to process order: " + lsMessaage.Trim(), "OrderImportClasses.ProcessOrders");
-                            }
+                        if (ret != null && ret.ET_RETURN != null && ret.ET_RETURN.Length > 0)
+                        {
+
+                            lbOK = true;                           
                             
+                            for (int i = 0; i < ret.ET_RETURN.Length; i++)
+                            {
+                                BAPIRET2 returnLine = ret.ET_RETURN[i];
+                                if (returnLine.TYPE.ToUpper() != "S")
+                                {
+                                    lbOK = false;
+                                    lsMessage += " " + returnLine.MESSAGE + " " +
+                                        returnLine.MESSAGE_V1 + " " +
+                                        returnLine.MESSAGE_V2 + " " +
+                                        returnLine.MESSAGE_V3 + " " +
+                                        returnLine.MESSAGE_V4;
+                                }
+                            }                          
+
                         }
+                        else
+                        {
+                            Log.LogError("Failed to import order", "OrderImportClasses.ProcessOrders");
+                            lsMessage = "Failed to import order id=" + h.ShipReqID.ToString();
+                        }                       
 
                     } catch(Exception ex){
                         
                         Log.LogError(ex.ToString(), "OrderImportClasses.ProcessOrders");
+                        lsMessage = ex.ToString();
                     }
 
-                    h.ProcessedDate =  DateTime.Now;
-                    h.ProcessedSuccessfully = lbOK;
-                    h.UpdateDate = System.DateTime.Now;
+                    using (SRT_SCT headerDB = new SRT_SCT())
+                    {
+                        ShippingRequestHeader loHeader = headerDB.ShippingRequestHeaders.Find(h.ShipReqID);
+                        loHeader.ProcessedDate =  DateTime.Now;
+                        loHeader.ProcessedSuccessfully = lbOK;
+                        loHeader.UpdateDate = System.DateTime.Now;
+                        headerDB.SaveChanges();
+                    }      
                     
-                    db.SaveChanges();
-                   
+                    if (lsMessage != "")
+                    {
+                        if (lsResult == "true")
+                            lsResult = lsMessage;
+                        else
+                        {
+                            lsResult += System.Environment.NewLine + lsMessage;
+                        }
+                    } 
                 }
-
             }
 
             catch (Exception ex)
             {
                 Log.LogError(ex.ToString(), "OrderImportClasses.ProcessOrders");
+                lsResult = ex.ToString();
+            }
+
+            return lsResult + "  - did " + liDone.ToString() + " records";
+        }
+
+        public void EncryptConfigSection(string psKey)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            ConfigurationSection section = config.GetSection(psKey);
+
+            if (section != null)
+            {
+                if (!section.SectionInformation.IsProtected)
+                {
+                    if (!section.ElementInformation.IsLocked)
+                    {
+                        section.SectionInformation.ProtectSection("DataProtectionConfigurationProvider");
+                        // section.SectionInformation.ForceSave = true;
+                        config.Save();
+                    }
+                }
             }
         }
+
+        public void DecryptConfigSection(string psKey)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            ConfigurationSection section = config.GetSection(psKey);
+
+            if (section != null)
+            {
+                if (section.SectionInformation.IsProtected)
+                {
+                    if (!section.ElementInformation.IsLocked)
+                    {
+                        section.SectionInformation.UnprotectSection();
+                        // section.SectionInformation.ForceSave = true;
+                        config.Save();
+                    }
+                }
+            }
+        }
+
     }
 }
