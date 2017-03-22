@@ -38,7 +38,7 @@ namespace OrderImportClasses
             {
                 List<ShippingRequestHeader> headerList;
                 
-                using (SRT_SCT hdb = new SRT_SCT())
+                using (SCTModel hdb = new SCTModel())
                 {
                     headerList = (from p in hdb.ShippingRequestHeaders where p.ProcessedDate == null select p).ToList();
                 }
@@ -58,10 +58,10 @@ namespace OrderImportClasses
                     header.TRATY = GetString(h.MeansOfTransportID);
                     header.KUNAG = GetString(h.CustomerAccountID);
                     header.SHIPFR = GetString(h.PickupFromID);
-                    header.BSTDK = GetString(h.PickupDate.ToString("yyyy/MM/dd"));
+                    header.BSTDK = GetString(h.PickupDate.ToString("yyyyMMdd"));
                     header.PICKUP = GetString(h.PickupTime);
                     header.SHIPTO = GetString(h.DeliverToID);
-                    header.VDATU = GetString(h.DeliveryDate.ToString("yyyy/MM/dd"));
+                    header.VDATU = GetString(h.DeliveryDate.ToString("yyyyMMdd"));
                     header.DELCO = GetString(h.DeliveryTime);
                     header.DELIV_INSTR = GetString(h.DeliveryInstructions);
 
@@ -69,7 +69,7 @@ namespace OrderImportClasses
 
                     List<ShippingRequestDetail> itemList;
 
-                    using (SRT_SCT hdb = new SRT_SCT())
+                    using (SCTModel hdb = new SCTModel())
                     {
                         itemList = (from p in hdb.ShippingRequestDetails where p.ShipReqID == h.ShipReqID select p).ToList();
                     }
@@ -88,30 +88,23 @@ namespace OrderImportClasses
 
                     so.IT_SO_ITEM = items.ToArray();                   
 
-                    BasicHttpBinding httpBinding = new BasicHttpBinding(BasicHttpSecurityMode.TransportCredentialOnly);                                      
+                  //  BasicHttpBinding httpBinding = new BasicHttpBinding(BasicHttpSecurityMode.TransportCredentialOnly);                                      
 
-                    httpBinding.Security.Transport.ClientCredentialType = System.ServiceModel.HttpClientCredentialType.Basic;
+                   // httpBinding.Security.Transport.ClientCredentialType = System.ServiceModel.HttpClientCredentialType.Basic;
 
-                    string wsurl = ConfigurationManager.AppSettings["SAPWSURL"];
+                   // string wsurl = ConfigurationManager.AppSettings["SAPWSURL"];
 
-                    EndpointAddress endPointAddr = new EndpointAddress(wsurl);
+                   // EndpointAddress endPointAddr = new EndpointAddress(wsurl);                                       
 
-                    ZSD_CREATE_WEB_SOClient ws = new ZSD_CREATE_WEB_SOClient(httpBinding, endPointAddr);
+                  // SCTWS.ZSD_CREATE_WEB_SALES_ORDER  ws = new ZSD_CREATE_WEB_SALES_ORDER();
 
                     string strUserName =  ConfigurationManager.AppSettings["SAPUserName"];
-                    string strPassword = ConfigurationManager.AppSettings["SAPUserPassword"]; 
+                    string strPassword = ConfigurationManager.AppSettings["SAPUserPassword"];
 
-                  //  System.Net.NetworkCredential cred = new System.Net.NetworkCredential(strUserName, strPassword);                   
+                    SCTWS.zsd_create_web_so ws = new SCTWS.zsd_create_web_so();
+                    System.Net.ICredentials cred = new System.Net.NetworkCredential(strUserName, strPassword);
+                    ws.Credentials = cred; 
 
-                  //  cred.Domain = "";
-
-                    ws.ClientCredentials.UserName.UserName = strUserName;
-                    ws.ClientCredentials.UserName.Password = strPassword;
-
-                    //  ws.ChannelFactory.Credentials.Windows.ClientCredential = cred;
-                    // ws.ClientCredentials.Windows.AllowNtlm = false;
-                    // service.ClientCredentials.Windows.AllowedImpersonationLevel = System.Security.Principal.   
-                                             
                     ZSD_CREATE_WEB_SALES_ORDERResponse ret = null;
 
                     bool lbOK = false;                                       
@@ -152,7 +145,7 @@ namespace OrderImportClasses
                         lsMessage = ex.ToString();
                     }
 
-                    using (SRT_SCT headerDB = new SRT_SCT())
+                    using (SCTModel headerDB = new SCTModel())
                     {
                         ShippingRequestHeader loHeader = headerDB.ShippingRequestHeaders.Find(h.ShipReqID);
                         loHeader.ProcessedDate =  DateTime.Now;

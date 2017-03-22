@@ -5,6 +5,6 @@
     Renaming the file extension or editing the content of this file may   
     cause the file to be unrecognizable by the program.
 -->
-<GenericObjectDataSource DisplayName="ZSD_CREATE_WEB_SALES_ORDERResponse1" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>OrderImportClasses.SCTWS.ZSD_CREATE_WEB_SALES_ORDERResponse1, Service References.SCTWS.Reference.cs.dll, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
+<GenericObjectDataSource DisplayName="ZSD_CREATE_WEB_SALES_ORDERResponse" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+   <TypeInfo>OrderImportClasses.SCTWS.ZSD_CREATE_WEB_SALES_ORDERResponse, Web References.SCTWS.Reference.cs.dll, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>

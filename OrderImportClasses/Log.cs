@@ -14,7 +14,7 @@ namespace OrderImportClasses
             E.DateCreated = System.DateTime.Now;
             E.Module = psModule;
             E.ErrorDetail = psMessage;
-            using  (SRT_SCT db = new SRT_SCT()){
+            using  (SCTModel db = new SCTModel()){
                 db.ShippingRequestErrors.Add(E);
                 db.SaveChanges();
             }           

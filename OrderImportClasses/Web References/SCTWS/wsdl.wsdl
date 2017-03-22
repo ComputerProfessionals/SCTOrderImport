@@ -4,14 +4,81 @@
     <sidl:sidl xmlns:sidl="http://www.sap.com/2007/03/sidl" />
   </wsdl:documentation>
   <wsp:UsingPolicy wsdl:required="true" />
+  <wsp:Policy wsu:Id="BN_BN_zsd_create_web_so">
+    <saptrnbnd:OptimizedXMLTransfer uri="http://xml.sap.com/2006/11/esi/esp/binxml" xmlns:saptrnbnd="http://www.sap.com/webas/710/soap/features/transportbinding/" wsp:Optional="true" />
+    <saptrnbnd:OptimizedMimeSerialization xmlns:saptrnbnd="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization" wsp:Optional="true" />
+    <wsp:ExactlyOne xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+      <wsp:All>
+        <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <sp:HttpsToken>
+                  <wsp:Policy>
+                    <sp:HttpBasicAuthentication />
+                  </wsp:Policy>
+                </sp:HttpsToken>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic128Rsa15 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+      </wsp:All>
+    </wsp:ExactlyOne>
+    <wsaw:UsingAddressing xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="true" />
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="BN_BN_zsd_create_web_so_SOAP12">
+    <saptrnbnd:OptimizedXMLTransfer uri="http://xml.sap.com/2006/11/esi/esp/binxml" xmlns:saptrnbnd="http://www.sap.com/webas/710/soap/features/transportbinding/" wsp:Optional="true" />
+    <saptrnbnd:OptimizedMimeSerialization xmlns:saptrnbnd="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization" wsp:Optional="true" />
+    <wsp:ExactlyOne xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+      <wsp:All>
+        <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <sp:HttpsToken>
+                  <wsp:Policy>
+                    <sp:HttpBasicAuthentication />
+                  </wsp:Policy>
+                </sp:HttpsToken>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic128Rsa15 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+      </wsp:All>
+    </wsp:ExactlyOne>
+    <wsaw:UsingAddressing xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="true" />
+  </wsp:Policy>
   <wsp:Policy wsu:Id="IF_IF_ZSD_CREATE_WEB_SO">
     <sapsession:Session xmlns:sapsession="http://www.sap.com/webas/630/soap/features/session/">
       <sapsession:enableSession>false</sapsession:enableSession>
     </sapsession:Session>
+    <sapcentraladmin:CentralAdministration xmlns:sapcentraladmin="http://www.sap.com/webas/700/soap/features/CentralAdministration/" wsp:Optional="true">
+      <sapcentraladmin:BusinessApplicationID>00155D1E82771ED783A1ED9BDA29E0E5</sapcentraladmin:BusinessApplicationID>
+    </sapcentraladmin:CentralAdministration>
   </wsp:Policy>
   <wsp:Policy wsu:Id="OP_IF_OP_ZSD_CREATE_WEB_SALES_ORDER">
-    <sapblock:enableBlocking xmlns:sapblock="http://www.sap.com/NW05/soap/features/blocking/">true</sapblock:enableBlocking>
     <sapcomhnd:enableCommit xmlns:sapcomhnd="http://www.sap.com/NW05/soap/features/commit/">false</sapcomhnd:enableCommit>
+    <sapblock:enableBlocking xmlns:sapblock="http://www.sap.com/NW05/soap/features/blocking/">true</sapblock:enableBlocking>
     <saptrhnw05:required xmlns:saptrhnw05="http://www.sap.com/NW05/soap/features/transaction/">no</saptrhnw05:required>
     <saprmnw05:enableWSRM xmlns:saprmnw05="http://www.sap.com/NW05/soap/features/wsrm/">false</saprmnw05:enableWSRM>
   </wsp:Policy>
@@ -196,6 +263,9 @@
         <sapdoc:docitem applicationComponent="SD" />
       </sapdoc:sapdoc>
     </wsdl:documentation>
+    <wsp:Policy>
+      <wsp:PolicyReference URI="#IF_IF_ZSD_CREATE_WEB_SO" />
+    </wsp:Policy>
     <wsdl:operation name="ZSD_CREATE_WEB_SALES_ORDER">
       <wsp:Policy>
         <wsp:PolicyReference URI="#OP_IF_OP_ZSD_CREATE_WEB_SALES_ORDER" />
@@ -204,4 +274,42 @@
       <wsdl:output message="tns:ZSD_CREATE_WEB_SALES_ORDERResponse" />
     </wsdl:operation>
   </wsdl:portType>
+  <wsdl:binding name="zsd_create_web_so" type="tns:ZSD_CREATE_WEB_SO">
+    <wsp:Policy>
+      <wsp:PolicyReference URI="#BN_BN_zsd_create_web_so" />
+    </wsp:Policy>
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ZSD_CREATE_WEB_SALES_ORDER">
+      <soap:operation soapAction="urn:sap-com:document:sap:rfc:functions:ZSD_CREATE_WEB_SO:ZSD_CREATE_WEB_SALES_ORDERRequest" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="zsd_create_web_so_SOAP12" type="tns:ZSD_CREATE_WEB_SO">
+    <wsp:Policy>
+      <wsp:PolicyReference URI="#BN_BN_zsd_create_web_so_SOAP12" />
+    </wsp:Policy>
+    <wsoap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ZSD_CREATE_WEB_SALES_ORDER">
+      <wsoap12:operation soapAction="urn:sap-com:document:sap:rfc:functions:ZSD_CREATE_WEB_SO:ZSD_CREATE_WEB_SALES_ORDERRequest" style="document" />
+      <wsdl:input>
+        <wsoap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsoap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="zsd_create_web_so">
+    <wsdl:port name="zsd_create_web_so" binding="tns:zsd_create_web_so">
+      <soap:address location="http://SAPVMSED.sctlogistics.com.au:8010/sap/bc/srt/rfc/sap/zsd_create_web_so/120/zsd_create_web_so/zsd_create_web_so" />
+    </wsdl:port>
+    <wsdl:port name="zsd_create_web_so_SOAP12" binding="tns:zsd_create_web_so_SOAP12">
+      <wsoap12:address location="http://SAPVMSED.sctlogistics.com.au:8010/sap/bc/srt/rfc/sap/zsd_create_web_so/120/zsd_create_web_so/zsd_create_web_so" />
+    </wsdl:port>
+  </wsdl:service>
 </wsdl:definitions>

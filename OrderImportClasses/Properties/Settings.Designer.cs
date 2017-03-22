@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Tester.Properties {
+namespace OrderImportClasses.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -20,6 +20,17 @@ namespace Tester.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://SAPVMSED.sctlogistics.com.au:8010/sap/bc/srt/rfc/sap/zsd_create_web_so/120" +
+            "/zsd_create_web_so/zsd_create_web_so")]
+        public string OrderImportClasses_SCTWS_zsd_create_web_so {
+            get {
+                return ((string)(this["OrderImportClasses_SCTWS_zsd_create_web_so"]));
             }
         }
     }

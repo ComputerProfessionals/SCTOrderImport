@@ -5,16 +5,16 @@ namespace OrderImportClasses
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
 
-    public partial class SRT_SCT : DbContext
+    public partial class SCTModel : DbContext
     {
-        public SRT_SCT()
-            : base("name=SRT_SCT")
+        public SCTModel()
+            : base("name=SCTModel")
         {
         }
 
         public virtual DbSet<ShippingRequestDetail> ShippingRequestDetails { get; set; }
-        public virtual DbSet<ShippingRequestHeader> ShippingRequestHeaders { get; set; }
         public virtual DbSet<ShippingRequestError> ShippingRequestErrors { get; set; }
+        public virtual DbSet<ShippingRequestHeader> ShippingRequestHeaders { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -41,6 +41,14 @@ namespace OrderImportClasses
             modelBuilder.Entity<ShippingRequestDetail>()
                 .Property(e => e.Volume)
                 .HasPrecision(12, 3);
+
+            modelBuilder.Entity<ShippingRequestError>()
+                .Property(e => e.ErrorDetail)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<ShippingRequestError>()
+                .Property(e => e.Module)
+                .IsUnicode(false);
 
             modelBuilder.Entity<ShippingRequestHeader>()
                 .Property(e => e.CustomerPONum)
@@ -86,14 +94,6 @@ namespace OrderImportClasses
                 .HasMany(e => e.ShippingRequestDetails)
                 .WithRequired(e => e.ShippingRequestHeader)
                 .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<ShippingRequestError>()
-                .Property(e => e.ErrorDetail)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<ShippingRequestError>()
-                .Property(e => e.Module)
-                .IsUnicode(false);
         }
     }
 }

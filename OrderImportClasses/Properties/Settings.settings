@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OrderImportClasses.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="OrderImportClasses_SCTWS_zsd_create_web_so" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://SAPVMSED.sctlogistics.com.au:8010/sap/bc/srt/rfc/sap/zsd_create_web_so/120/zsd_create_web_so/zsd_create_web_so</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
