@@ -28,13 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.objTimer = new System.Windows.Forms.Timer(this.components);
-            // 
-            // objTimer
-            // 
-            this.objTimer.Enabled = true;
-            this.objTimer.Interval = 2000;            
             // 
             // OrderImport
             // 
@@ -43,7 +36,5 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Timer objTimer;
     }
 }
