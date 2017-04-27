@@ -118,21 +118,24 @@ namespace OrderImportService
                 DataTable dt = (new DataHelper()).GetDataTable("select * from SiteConfig");
 
                 string lsRecipients = AppSettingValue("ErrorRecipients");
+                string lsBody =  "<div style='font-family:arial;font-size:10pt'>" + 
+                                "<div style='font-size:13pt;'>" + 
+                                    "The following error occurred when attempting to save an online customer order:" + 
+                                "</div>" + 
+                                "<div style='padding:20px;'>" + psMessage + "</div>" + 
+                            "</div>";
+
+                string lsSubject = AppSettingValue("ErrorSubject");
 
                 foreach (string lsTo in lsRecipients.Split(';'))
                 {
                     if (lsTo.Trim() != "")
                     {
 
-                        MailHelper mh = new MailHelper();                       
-                          
-                        mh.Body = 
-                            "<div style='font-family:arial;font-size:10pt'>" + 
-                                "<div style='font-size:13pt;font-weight:bold'>" + 
-                                    "The following error occurred when attempting to save an online customer order:" + 
-                                "</div>" + 
-                                "<div style='padding:20px;'>" + psMessage + "</div>" + 
-                            "</div>";
+                        MailHelper mh = new MailHelper();
+
+                        mh.Body = lsBody;
+                           
                         mh.HostName = GetString(dt.Rows[0]["SMTPServer"]); // "MELSVEX3046.SCTLOGISTICS.COM.AU"; //lsHostName;
 
                         mh.FromEmail = GetString(dt.Rows[0]["SMTPEmail"]); // "admin_noreply@sctlogistics.com";
@@ -141,11 +144,10 @@ namespace OrderImportService
                         mh.SiteName = GetString(dt.Rows[0]["SiteName"]);
                         mh.SMTPEmail = GetString(dt.Rows[0]["SMTPEmail"]);
                         mh.SMTPPassword = GetString(dt.Rows[0]["SMTPPassword"]);
-                        mh.Subject = AppSettingValue("ErrorSubject");
+                        mh.Subject = lsSubject;
                         mh.SMTPPort = 0;
                         mh.SendEmail();
                     }
-
                 }   
             }
             catch (Exception e) {
