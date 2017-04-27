@@ -32,7 +32,8 @@ namespace Tester
         private void btnTest_Click(object sender, EventArgs e)
         {
             ProcessOrders po = new ProcessOrders();
-            string lsResult = po.Process();
+            string lsResult = "";
+            po.Process(out lsResult);
             MessageBox.Show(lsResult);
 
         }       

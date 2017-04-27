@@ -46,9 +46,10 @@ namespace OrderImportClasses
             
         }
 
-        public string Process()
+        public bool Process(out string psMessage)
         {
-            string lsResult = "true";
+            bool lbResult = true;
+            psMessage = "";
             int liDone = 0;
             SCTWS.zsd_create_web_so ws=null;
             try
@@ -67,7 +68,8 @@ namespace OrderImportClasses
                 if (strUserName == "" || strPassword == "")
                 {
                     Log.LogError("Failed to get sap username and or password", "OrderImportClasses.ProcessOrders");
-                    return "Failed to get sap username and or password";                   
+                    psMessage= "Failed to get sap username and or password";
+                    return false;                   
                 }
 
                 List<ShippingRequestHeader> headerList;
@@ -84,6 +86,14 @@ namespace OrderImportClasses
 
                     using (SCTModel hdb = new SCTModel())
                     {
+                         ShippingRequestHeader h1 = hdb.ShippingRequestHeaders.Find(h.ShipReqID);
+                        h1.ProcessedDate = System.DateTime.Now;                       
+                        hdb.SaveChanges();                        
+                    }                 
+
+
+                    using (SCTModel hdb = new SCTModel())
+                    {
                         itemList = (from p in hdb.ShippingRequestDetails where p.ShipReqID == h.ShipReqID select p).ToList();
                     }
 
@@ -93,8 +103,7 @@ namespace OrderImportClasses
                        // Log.LogError("Doing header " + h.ShipReqID.ToString(), "OrderImportClasses.ProcessOrders");
 
                         liDone += 1;
-
-                        string lsMessage = "";
+                        
                         string lsSAPOrderNumber = "";
 
                         ZSD_CREATE_WEB_SALES_ORDER so = new ZSD_CREATE_WEB_SALES_ORDER();
@@ -113,19 +122,22 @@ namespace OrderImportClasses
 
                         if (header.PICKUP == "")
                         {
-                            lsResult = "Unable to resolve PICKUP time code for " + GetString(h.PickupTime);
-                            Log.LogError(lsResult, "OrderImportClasses.ProcessOrders");
-                            return lsResult;
+                            psMessage = "Unable to resolve PICKUP time code for " + GetString(h.PickupTime);
+                            Log.LogError(psMessage, "OrderImportClasses.ProcessOrders");
+                            return false;
                         }
+
                         header.SHIPTO = GetString(h.DeliverToID);
                         header.VDATU = GetString(h.DeliveryDate.ToString("yyyy-MM-dd"));
                         header.DELCO = GetTimeCode(GetString(h.DeliveryTime));
+
                         if (header.DELCO == "")
                         {
-                            lsResult = "Unable to resolve DELCO time code for " + GetString(h.PickupTime);
-                            Log.LogError(lsResult, "OrderImportClasses.ProcessOrders");
-                            return lsResult;
+                            psMessage = "Unable to resolve DELCO time code for " + GetString(h.PickupTime);
+                            Log.LogError(psMessage, "OrderImportClasses.ProcessOrders");
+                            return false;
                         }
+
                         header.DELIV_INSTR = GetString(h.DeliveryInstructions);
 
                         List<ZSD_WEB_SO_ITEM_S> items = new List<ZSD_WEB_SO_ITEM_S>();
@@ -151,9 +163,7 @@ namespace OrderImportClasses
                         retlist.Add(bret);
                         so.ET_RETURN = retlist.ToArray();                        
 
-                        ZSD_CREATE_WEB_SALES_ORDERResponse ret = null;
-
-                        bool lbOK = false;
+                        ZSD_CREATE_WEB_SALES_ORDERResponse ret = null;                                               
 
                         if (ws == null)
                         {
@@ -168,13 +178,11 @@ namespace OrderImportClasses
 
                         try
                         {
-                          //  Log.LogError("Pre send web request", "OrderImportClasses.ProcessOrders");
+                           // Log.LogError("Pre send web request", "OrderImportClasses.ProcessOrders");
                             ret = ws.ZSD_CREATE_WEB_SALES_ORDER(so);
-                          //  Log.LogError("Post send web request", "OrderImportClasses.ProcessOrders");
+                           // Log.LogError("Post send web request", "OrderImportClasses.ProcessOrders");
                             if (ret != null && ret.ET_RETURN != null && ret.ET_RETURN.Length > 0)
-                            {
-
-                                lbOK = true;
+                            {                                                               
 
                                 for (int i = 0; i < ret.ET_RETURN.Length; i++)
                                 {
@@ -187,8 +195,8 @@ namespace OrderImportClasses
 
                                     if (returnLine.TYPE.ToUpper() != "S")
                                     {
-                                        lbOK = false;
-                                        lsMessage += " " + allMessages;                                       
+                                        lbResult = false;
+                                        psMessage += " " + allMessages;                                       
                                     }
                                     else
                                     {
@@ -205,8 +213,8 @@ namespace OrderImportClasses
                             }
                             else
                             {
-                                Log.LogError("Failed to import order", "OrderImportClasses.ProcessOrders");
-                                lsMessage = "Failed to import order id=" + h.ShipReqID.ToString();
+                                Log.LogError("Failed to import order - no return data from web service.", "OrderImportClasses.ProcessOrders");                               
+                                lbResult = false;
                             }
 
                         }
@@ -214,49 +222,42 @@ namespace OrderImportClasses
                         {
 
                             Log.LogError(ex.ToString(), "OrderImportClasses.ProcessOrders");
-                            lsMessage = ex.ToString();
+                            psMessage = ex.ToString();
+                            lbResult = false;
                         }
 
                         using (SCTModel headerDB = new SCTModel())
                         {
                             ShippingRequestHeader loHeader = headerDB.ShippingRequestHeaders.Find(h.ShipReqID);
 
-                            if (lbOK)
-                            {
-                                loHeader.ProcessedDate = DateTime.Now;
+                            if (lbResult)
+                            {                               
                                 loHeader.SAPOrderNumber = lsSAPOrderNumber;
-                                lsMessage += " created order " + lsSAPOrderNumber;
+                                psMessage += " created order " + lsSAPOrderNumber;
+                                lbResult = true;
                             }
-                            else {
-                                loHeader.ProcessedDate = null;
+                            else {                              
                                 loHeader.SAPOrderNumber = "";
-                                Log.LogError("Sales Request Header " + h.ShipReqID.ToString() + " failed: " +  lsMessage, "OrderImportClasses.ProcessOrders");
+
+                                Log.LogError("Failed to create Sales Request Header. " + h.ShipReqID.ToString() +  
+                                    psMessage + "Order ID=" + h.ShipReqID.ToString() + "; Customer ID = " + so.IS_SO_HEADER.KUNAG + "; Order No = " + so.IS_SO_HEADER.BSTDK, 
+                                    "OrderImportClasses.ProcessOrders");
+                                lbResult = false;
                             }
 
-                            loHeader.ProcessedSuccessfully = lbOK;
+                            loHeader.ProcessedSuccessfully = lbResult;
                             loHeader.UpdateDate = System.DateTime.Now;
                             headerDB.SaveChanges();
-                        }
-
-                        if (lsMessage != "")
-                        {                           
-
-                            if (lsResult != "true")
-                                lsResult = lsMessage;
-                            else
-                            {
-                                lsResult += System.Environment.NewLine + lsMessage;
-                            }
-                        }
+                        }                       
                     }
                 }
-
             }
 
             catch (Exception ex)
             {
                 Log.LogError(ex.ToString(), "OrderImportClasses.ProcessOrders");
-                lsResult = ex.ToString();
+                psMessage = ex.ToString();
+                lbResult = false;
             }
             finally
             {
@@ -266,7 +267,7 @@ namespace OrderImportClasses
                 }
             }
 
-            return lsResult + "  - did " + liDone.ToString() + " records";
+            return lbResult;
         }
 
         public void EncryptConfigSection(string psKey)
