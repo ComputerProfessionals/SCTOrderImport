@@ -70,6 +70,7 @@
     <Compile Include="ShippingRequestDetail.cs" />
     <Compile Include="ShippingRequestError.cs" />
     <Compile Include="ShippingRequestHeader.cs" />
+    <Compile Include="TimeCodeMap.cs" />
     <Compile Include="Web References\SCTWS\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -81,6 +82,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="bin\OrderImportClasses.dll.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

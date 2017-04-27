@@ -65,6 +65,9 @@ namespace OrderImportClasses
 
         public bool ProcessedSuccessfully { get; set; }
 
+        [StringLength(100)]
+        public string SAPOrderNumber { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ShippingRequestDetail> ShippingRequestDetails { get; set; }
     }

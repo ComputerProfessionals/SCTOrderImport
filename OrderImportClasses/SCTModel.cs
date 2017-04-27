@@ -15,6 +15,7 @@ namespace OrderImportClasses
         public virtual DbSet<ShippingRequestDetail> ShippingRequestDetails { get; set; }
         public virtual DbSet<ShippingRequestError> ShippingRequestErrors { get; set; }
         public virtual DbSet<ShippingRequestHeader> ShippingRequestHeaders { get; set; }
+        public virtual DbSet<TimeCodeMap> TimeCodeMaps { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -91,9 +92,17 @@ namespace OrderImportClasses
                 .IsUnicode(false);
 
             modelBuilder.Entity<ShippingRequestHeader>()
+                .Property(e => e.SAPOrderNumber)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<ShippingRequestHeader>()
                 .HasMany(e => e.ShippingRequestDetails)
                 .WithRequired(e => e.ShippingRequestHeader)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TimeCodeMap>()
+                .Property(e => e.TimeVal)
+                .IsUnicode(false);
         }
     }
 }

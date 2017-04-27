@@ -20,8 +20,8 @@ namespace OrderImportClasses.SCTWS {
     using System.Web.Services.Protocols;
     using System.Xml.Serialization;
     using System.ComponentModel;
-    
-    
+    using System.Net;
+
     /// <remarks/>
     // CODEGEN: The optional WSDL extension element 'Policy' from namespace 'http://schemas.xmlsoap.org/ws/2004/09/policy' was not handled.
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1586.0")]
@@ -29,7 +29,14 @@ namespace OrderImportClasses.SCTWS {
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="zsd_create_web_so", Namespace="urn:sap-com:document:sap:rfc:functions")]
     public partial class zsd_create_web_so : System.Web.Services.Protocols.SoapHttpClientProtocol {
-        
+
+        protected override WebRequest GetWebRequest(Uri uri)
+        {
+            var webRequest = (HttpWebRequest)base.GetWebRequest(uri);
+            webRequest.KeepAlive = false;
+            return webRequest;
+        }
+
         private System.Threading.SendOrPostCallback ZSD_CREATE_WEB_SALES_ORDEROperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
