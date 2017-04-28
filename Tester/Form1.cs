@@ -31,10 +31,21 @@ namespace Tester
 
         private void btnTest_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
+
             ProcessOrders po = new ProcessOrders();
             string lsResult = "";
-            po.Process(out lsResult);
-            MessageBox.Show(lsResult);
+
+            if (po.Process(out lsResult))
+            {
+                MessageBox.Show("Orders have been processed. " + lsResult);
+            }
+            else
+            {
+                MessageBox.Show("Failed to process orders. " + lsResult);
+            }
+
+            this.Cursor = Cursors.Default;
 
         }       
 

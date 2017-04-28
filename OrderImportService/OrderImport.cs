@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using OrderImportClasses;
+using DataModel;
 
 
 namespace OrderImportService
@@ -115,44 +116,62 @@ namespace OrderImportService
         private void SendErrorEmails(string psMessage)
         {
             try {
-                DataTable dt = (new DataHelper()).GetDataTable("select * from SiteConfig");
+              
 
                 string lsRecipients = AppSettingValue("ErrorRecipients");
-                string lsBody =  "<div style='font-family:arial;font-size:10pt'>" + 
-                                "<div style='font-size:13pt;'>" + 
-                                    "The following error occurred when attempting to save an online customer order:" + 
-                                "</div>" + 
-                                "<div style='padding:20px;'>" + psMessage + "</div>" + 
+                string lsBody = "<div style='font-family:arial;font-size:10pt'>" +
+                                "<div style='font-size:13pt;'>" +
+                                    "The following error occurred when attempting to save an online customer order:" +
+                                "</div>" +
+                                "<div style='padding:20px;'>" + psMessage + "</div>" +
                             "</div>";
 
                 string lsSubject = AppSettingValue("ErrorSubject");
 
                 foreach (string lsTo in lsRecipients.Split(';'))
                 {
-                    if (lsTo.Trim() != "")
+                    if (lsTo.Trim() != "" && lsTo.IndexOf("@") > -1)
                     {
 
                         MailHelper mh = new MailHelper();
 
                         mh.Body = lsBody;
-                           
-                        mh.HostName = GetString(dt.Rows[0]["SMTPServer"]); // "MELSVEX3046.SCTLOGISTICS.COM.AU"; //lsHostName;
 
-                        mh.FromEmail = GetString(dt.Rows[0]["SMTPEmail"]); // "admin_noreply@sctlogistics.com";
+                        mh.HostName = GetConfigProperty("SMTPServer"); // "MELSVEX3046.SCTLOGISTICS.COM.AU"; //lsHostName;
+
+                        mh.FromEmail = GetConfigProperty("SMTPEmail"); // "noreply@sctlogistics.com";
                         mh.IsHtmlBody = true;
-                        mh.ToEmail = lsTo;
-                        mh.SiteName = GetString(dt.Rows[0]["SiteName"]);
-                        mh.SMTPEmail = GetString(dt.Rows[0]["SMTPEmail"]);
-                        mh.SMTPPassword = GetString(dt.Rows[0]["SMTPPassword"]);
+                        mh.ToEmail = lsTo.Trim();
+                        mh.SiteName = GetConfigProperty("SiteName");
+                        mh.SMTPEmail = GetConfigProperty("SMTPEmail");
+                        mh.SMTPPassword = GetConfigProperty("SMTPPassword");
                         mh.Subject = lsSubject;
                         mh.SMTPPort = 0;
                         mh.SendEmail();
                     }
-                }   
+                }
+                 
             }
             catch (Exception e) {
                 Log.LogError(e.ToString(), "OrderImportService.SendErrorEmails");
             }
+        }
+
+        private string GetConfigProperty(string psProperty)
+        {
+            string lsResult = "";
+            using (DataModel.SCT db = new DataModel.SCT())
+            {
+                SiteConfig sc = db.SiteConfigs.First(s => s.ConfigValue == psProperty);
+                if (sc != null)
+                {
+                    lsResult = GetString(sc.ConfigValue);
+                }
+            }
+
+            return lsResult;    
+           
+
         }
 
         private string GetString(object poValue)

@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SCTModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="SiteConfig">
+          <Key>
+            <PropertyRef Name="SiteConfigID" />
+          </Key>
+          <Property Name="SiteConfigID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConfigItem" Type="nvarchar(max)" />
+          <Property Name="ConfigValue" Type="nvarchar(max)" />
+          <Property Name="IsDeleted" Type="bit" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="UpdatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ShippingRequestDetails">
+          <Key>
+            <PropertyRef Name="ShipReqDtlID" />
+          </Key>
+          <Property Name="ShipReqDtlID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ShipReqID" Type="int" Nullable="false" />
+          <Property Name="MaterialNumber" Type="varchar" MaxLength="100" />
+          <Property Name="Quantity" Type="decimal" Precision="10" Scale="1" Nullable="false" />
+          <Property Name="UnitOfMeasure" Type="varchar" MaxLength="10" />
+          <Property Name="NetWeight" Type="decimal" Precision="12" Scale="3" Nullable="false" />
+          <Property Name="GrossWeight" Type="decimal" Precision="12" Scale="3" Nullable="false" />
+          <Property Name="Volume" Type="decimal" Precision="12" Scale="3" Nullable="false" />
+          <Property Name="CreateDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ShippingRequestErrors">
+          <Key>
+            <PropertyRef Name="ShippingRequestErrorID" />
+          </Key>
+          <Property Name="ShippingRequestErrorID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ErrorDetail" Type="varchar(max)" />
+          <Property Name="Module" Type="varchar" MaxLength="4000" />
+          <Property Name="DateCreated" Type="datetime" />
+          <Property Name="ShipReqID" Type="int" />
+        </EntityType>
+        <EntityType Name="ShippingRequestHeaders">
+          <Key>
+            <PropertyRef Name="ShipReqID" />
+          </Key>
+          <Property Name="ShipReqID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerPONum" Type="varchar" MaxLength="35" />
+          <Property Name="ConsignmentRef" Type="varchar" MaxLength="35" />
+          <Property Name="TemperatureID" Type="varchar" MaxLength="10" />
+          <Property Name="MeansOfTransportID" Type="varchar" MaxLength="10" />
+          <Property Name="CustomerAccountID" Type="varchar" MaxLength="10" />
+          <Property Name="PickupFromID" Type="varchar" MaxLength="10" />
+          <Property Name="PickupDate" Type="date" Nullable="false" />
+          <Property Name="PickupTime" Type="varchar" MaxLength="5" />
+          <Property Name="DeliverToID" Type="varchar" MaxLength="10" />
+          <Property Name="DeliveryDate" Type="date" Nullable="false" />
+          <Property Name="DeliveryTime" Type="varchar" MaxLength="5" />
+          <Property Name="DeliveryInstructions" Type="varchar(max)" />
+          <Property Name="CreateDate" Type="datetime" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="int" Nullable="false" />
+          <Property Name="ProcessedDate" Type="datetime" />
+          <Property Name="ProcessedSuccessfully" Type="bit" Nullable="false" />
+          <Property Name="SAPOrderNumber" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="TimeCodeMap">
+          <Key>
+            <PropertyRef Name="SCTTimeMapID" />
+          </Key>
+          <Property Name="SCTTimeMapID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TimeCode" Type="int" />
+          <Property Name="TimeVal" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <Association Name="FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID">
+          <End Role="ShippingRequestHeaders" Type="Self.ShippingRequestHeaders" Multiplicity="1" />
+          <End Role="ShippingRequestDetails" Type="Self.ShippingRequestDetails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ShippingRequestHeaders">
+              <PropertyRef Name="ShipReqID" />
+            </Principal>
+            <Dependent Role="ShippingRequestDetails">
+              <PropertyRef Name="ShipReqID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="SCTModelStoreContainer">
+          <EntitySet Name="SiteConfig" EntityType="Self.SiteConfig" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ShippingRequestDetails" EntityType="Self.ShippingRequestDetails" Schema="sct" store:Type="Tables" />
+          <EntitySet Name="ShippingRequestErrors" EntityType="Self.ShippingRequestErrors" Schema="sct" store:Type="Tables" />
+          <EntitySet Name="ShippingRequestHeaders" EntityType="Self.ShippingRequestHeaders" Schema="sct" store:Type="Tables" />
+          <EntitySet Name="TimeCodeMap" EntityType="Self.TimeCodeMap" Schema="sct" store:Type="Tables" />
+          <AssociationSet Name="FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID" Association="Self.FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID">
+            <End Role="ShippingRequestHeaders" EntitySet="ShippingRequestHeaders" />
+            <End Role="ShippingRequestDetails" EntitySet="ShippingRequestDetails" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SCTModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="SiteConfig">
+          <Key>
+            <PropertyRef Name="SiteConfigID" />
+          </Key>
+          <Property Name="SiteConfigID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConfigItem" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ConfigValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="UpdatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="ShippingRequestDetail">
+          <Key>
+            <PropertyRef Name="ShipReqDtlID" />
+          </Key>
+          <Property Name="ShipReqDtlID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ShipReqID" Type="Int32" Nullable="false" />
+          <Property Name="MaterialNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Quantity" Type="Decimal" Precision="10" Scale="1" Nullable="false" />
+          <Property Name="UnitOfMeasure" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="NetWeight" Type="Decimal" Precision="12" Scale="3" Nullable="false" />
+          <Property Name="GrossWeight" Type="Decimal" Precision="12" Scale="3" Nullable="false" />
+          <Property Name="Volume" Type="Decimal" Precision="12" Scale="3" Nullable="false" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ShippingRequestHeader" Relationship="Self.FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID" FromRole="ShippingRequestDetails" ToRole="ShippingRequestHeaders" />
+        </EntityType>
+        <EntityType Name="ShippingRequestError">
+          <Key>
+            <PropertyRef Name="ShippingRequestErrorID" />
+          </Key>
+          <Property Name="ShippingRequestErrorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ErrorDetail" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Module" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="DateCreated" Type="DateTime" Precision="3" />
+          <Property Name="ShipReqID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="ShippingRequestHeader">
+          <Key>
+            <PropertyRef Name="ShipReqID" />
+          </Key>
+          <Property Name="ShipReqID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerPONum" Type="String" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="ConsignmentRef" Type="String" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="TemperatureID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="MeansOfTransportID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerAccountID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="PickupFromID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="PickupDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="PickupTime" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="DeliverToID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="DeliveryDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="DeliveryTime" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="DeliveryInstructions" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedBy" Type="Int32" Nullable="false" />
+          <Property Name="ProcessedDate" Type="DateTime" Precision="3" />
+          <Property Name="ProcessedSuccessfully" Type="Boolean" Nullable="false" />
+          <Property Name="SAPOrderNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ShippingRequestDetails" Relationship="Self.FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID" FromRole="ShippingRequestHeaders" ToRole="ShippingRequestDetails" />
+        </EntityType>
+        <EntityType Name="TimeCodeMap">
+          <Key>
+            <PropertyRef Name="SCTTimeMapID" />
+          </Key>
+          <Property Name="SCTTimeMapID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TimeCode" Type="Int32" />
+          <Property Name="TimeVal" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID">
+          <End Role="ShippingRequestHeaders" Type="Self.ShippingRequestHeader" Multiplicity="1" />
+          <End Role="ShippingRequestDetails" Type="Self.ShippingRequestDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ShippingRequestHeaders">
+              <PropertyRef Name="ShipReqID" />
+            </Principal>
+            <Dependent Role="ShippingRequestDetails">
+              <PropertyRef Name="ShipReqID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="SCT" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="SiteConfigs" EntityType="Self.SiteConfig" />
+          <EntitySet Name="ShippingRequestDetails" EntityType="Self.ShippingRequestDetail" />
+          <EntitySet Name="ShippingRequestErrors" EntityType="Self.ShippingRequestError" />
+          <EntitySet Name="ShippingRequestHeaders" EntityType="Self.ShippingRequestHeader" />
+          <EntitySet Name="TimeCodeMaps" EntityType="Self.TimeCodeMap" />
+          <AssociationSet Name="FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID" Association="Self.FK_sct_ShippingRequestDetails_sct_ShippingRequestHeaders_ShipReqID">
+            <End Role="ShippingRequestHeaders" EntitySet="ShippingRequestHeaders" />
+            <End Role="ShippingRequestDetails" EntitySet="ShippingRequestDetails" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SCTModelStoreContainer" CdmEntityContainer="SCT">
+          <EntitySetMapping Name="SiteConfigs">
+            <EntityTypeMapping TypeName="SCTModel.SiteConfig">
+              <MappingFragment StoreEntitySet="SiteConfig">
+                <ScalarProperty Name="SiteConfigID" ColumnName="SiteConfigID" />
+                <ScalarProperty Name="ConfigItem" ColumnName="ConfigItem" />
+                <ScalarProperty Name="ConfigValue" ColumnName="ConfigValue" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ShippingRequestDetails">
+            <EntityTypeMapping TypeName="SCTModel.ShippingRequestDetail">
+              <MappingFragment StoreEntitySet="ShippingRequestDetails">
+                <ScalarProperty Name="ShipReqDtlID" ColumnName="ShipReqDtlID" />
+                <ScalarProperty Name="ShipReqID" ColumnName="ShipReqID" />
+                <ScalarProperty Name="MaterialNumber" ColumnName="MaterialNumber" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="UnitOfMeasure" ColumnName="UnitOfMeasure" />
+                <ScalarProperty Name="NetWeight" ColumnName="NetWeight" />
+                <ScalarProperty Name="GrossWeight" ColumnName="GrossWeight" />
+                <ScalarProperty Name="Volume" ColumnName="Volume" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ShippingRequestErrors">
+            <EntityTypeMapping TypeName="SCTModel.ShippingRequestError">
+              <MappingFragment StoreEntitySet="ShippingRequestErrors">
+                <ScalarProperty Name="ShipReqID" ColumnName="ShipReqID" />
+                <ScalarProperty Name="ShippingRequestErrorID" ColumnName="ShippingRequestErrorID" />
+                <ScalarProperty Name="ErrorDetail" ColumnName="ErrorDetail" />
+                <ScalarProperty Name="Module" ColumnName="Module" />
+                <ScalarProperty Name="DateCreated" ColumnName="DateCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ShippingRequestHeaders">
+            <EntityTypeMapping TypeName="SCTModel.ShippingRequestHeader">
+              <MappingFragment StoreEntitySet="ShippingRequestHeaders">
+                <ScalarProperty Name="ShipReqID" ColumnName="ShipReqID" />
+                <ScalarProperty Name="CustomerPONum" ColumnName="CustomerPONum" />
+                <ScalarProperty Name="ConsignmentRef" ColumnName="ConsignmentRef" />
+                <ScalarProperty Name="TemperatureID" ColumnName="TemperatureID" />
+                <ScalarProperty Name="MeansOfTransportID" ColumnName="MeansOfTransportID" />
+                <ScalarProperty Name="CustomerAccountID" ColumnName="CustomerAccountID" />
+                <ScalarProperty Name="PickupFromID" ColumnName="PickupFromID" />
+                <ScalarProperty Name="PickupDate" ColumnName="PickupDate" />
+                <ScalarProperty Name="PickupTime" ColumnName="PickupTime" />
+                <ScalarProperty Name="DeliverToID" ColumnName="DeliverToID" />
+                <ScalarProperty Name="DeliveryDate" ColumnName="DeliveryDate" />
+                <ScalarProperty Name="DeliveryTime" ColumnName="DeliveryTime" />
+                <ScalarProperty Name="DeliveryInstructions" ColumnName="DeliveryInstructions" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="ProcessedDate" ColumnName="ProcessedDate" />
+                <ScalarProperty Name="ProcessedSuccessfully" ColumnName="ProcessedSuccessfully" />
+                <ScalarProperty Name="SAPOrderNumber" ColumnName="SAPOrderNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TimeCodeMaps">
+            <EntityTypeMapping TypeName="SCTModel.TimeCodeMap">
+              <MappingFragment StoreEntitySet="TimeCodeMap">
+                <ScalarProperty Name="SCTTimeMapID" ColumnName="SCTTimeMapID" />
+                <ScalarProperty Name="TimeCode" ColumnName="TimeCode" />
+                <ScalarProperty Name="TimeVal" ColumnName="TimeVal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

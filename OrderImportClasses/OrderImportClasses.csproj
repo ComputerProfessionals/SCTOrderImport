@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataHelper.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="MailHelper.cs" />
     <Compile Include="ProcessOrders.cs" />
@@ -68,11 +67,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="SCTModel.cs" />
-    <Compile Include="ShippingRequestDetail.cs" />
-    <Compile Include="ShippingRequestError.cs" />
-    <Compile Include="ShippingRequestHeader.cs" />
-    <Compile Include="TimeCodeMap.cs" />
     <Compile Include="Web References\SCTWS\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -122,6 +116,12 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>OrderImportClasses_SCTWS_zsd_create_web_so</CachedSettingsPropName>
     </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataModel\DataModel.csproj">
+      <Project>{cb80187b-e7e9-436c-aef9-4fbbed42d8c4}</Project>
+      <Name>DataModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

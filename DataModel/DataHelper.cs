@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Configuration;
 
-namespace OrderImportClasses
+namespace DataModel
 {
     public class DataHelper
     {
@@ -16,7 +16,7 @@ namespace OrderImportClasses
 
             try {
 
-                using (SCTModel db = new SCTModel())
+                using (SCT db = new SCT())
                 {
 
                     string conStr = db.Database.Connection.ConnectionString;
@@ -40,11 +40,24 @@ namespace OrderImportClasses
                  
             }
             catch (Exception e) {
-                Log.LogError(e.ToString(), "OrderImportClasses.DataHelper.GetDataTable()");
+                LogError(e.ToString(), "OrderImportClasses.DataHelper.GetDataTable()");
             }
            
             return dt;
 
+        }
+
+        public  void LogError(string psMessage, string psModule)
+        {
+            ShippingRequestError E = new ShippingRequestError();// new ShippingRequestError();
+            E.DateCreated = System.DateTime.Now;
+            E.Module = psModule;
+            E.ErrorDetail = psMessage;
+            using (SCT db = new SCT())
+            {
+                db.ShippingRequestErrors.Add(E);
+                db.SaveChanges();
+            }
         }
     }
 }

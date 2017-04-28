@@ -98,6 +98,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataModel\DataModel.csproj">
+      <Project>{cb80187b-e7e9-436c-aef9-4fbbed42d8c4}</Project>
+      <Name>DataModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OrderImportClasses\OrderImportClasses.csproj">
       <Project>{b44a9a38-05c4-4b25-b10e-85ea7f209de8}</Project>
       <Name>OrderImportClasses</Name>
