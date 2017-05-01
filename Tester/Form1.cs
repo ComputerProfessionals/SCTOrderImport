@@ -36,14 +36,9 @@ namespace Tester
             ProcessOrders po = new ProcessOrders();
             string lsResult = "";
 
-            if (po.Process(out lsResult))
-            {
-                MessageBox.Show("Orders have been processed. " + lsResult);
-            }
-            else
-            {
-                MessageBox.Show("Failed to process orders. " + lsResult);
-            }
+            po.Process(out lsResult);
+            
+            MessageBox.Show("Orders have been processed. " + lsResult);          
 
             this.Cursor = Cursors.Default;
 
@@ -52,10 +47,22 @@ namespace Tester
       
         private void btnDecrypt_Click(object sender, EventArgs e)
         {
-            ProcessOrders p = new ProcessOrders();            
-            p.DecryptConfigSection("appSettings");
-            p.DecryptConfigSection("connectionStrings");           
-           
+            try
+            {
+                this.Cursor = Cursors.WaitCursor;
+                ProcessOrders p = new ProcessOrders();            
+                p.DecryptConfigSection("appSettings");
+                p.DecryptConfigSection("connectionStrings");
+              
+                MessageBox.Show("Config file has been decrypted.");
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            this.Cursor = Cursors.Default;
+
+
 
         }
     }
