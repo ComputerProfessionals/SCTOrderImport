@@ -94,12 +94,7 @@ namespace OrderImportService
                     ProcessOrders loPO = new ProcessOrders();
                     string lsMessage = "";
                     bool lbResult = loPO.Process(out lsMessage);
-                    polling = false;
-
-                    if (!lbResult)
-                    {
-                        SendErrorEmails(lsMessage);
-                    }
+                    polling = false;                   
                     
                 }
             }
@@ -111,92 +106,9 @@ namespace OrderImportService
                 if (started==true && polling==true)
                     polling = false;
             }
-        }
+        }       
 
-        private void SendErrorEmails(string psMessage)
-        {
-            try {
-              
-
-                string lsRecipients = AppSettingValue("ErrorRecipients");
-                string lsBody = "<div style='font-family:arial;font-size:10pt'>" +
-                                "<div style='font-size:13pt;'>" +
-                                    "The following error occurred when attempting to save an online customer order:" +
-                                "</div>" +
-                                "<div style='padding:20px;'>" + psMessage + "</div>" +
-                            "</div>";
-
-                string lsSubject = AppSettingValue("ErrorSubject");
-
-                foreach (string lsTo in lsRecipients.Split(';'))
-                {
-                    if (lsTo.Trim() != "" && lsTo.IndexOf("@") > -1)
-                    {
-
-                        MailHelper mh = new MailHelper();
-
-                        mh.Body = lsBody;
-
-                        mh.HostName = GetConfigProperty("SMTPServer"); // "MELSVEX3046.SCTLOGISTICS.COM.AU"; //lsHostName;
-
-                        mh.FromEmail = GetConfigProperty("SMTPEmail"); // "noreply@sctlogistics.com";
-                        mh.IsHtmlBody = true;
-                        mh.ToEmail = lsTo.Trim();
-                        mh.SiteName = GetConfigProperty("SiteName");
-                        mh.SMTPEmail = GetConfigProperty("SMTPEmail");
-                        mh.SMTPPassword = GetConfigProperty("SMTPPassword");
-                        mh.Subject = lsSubject;
-                        mh.SMTPPort = 0;
-                        mh.SendEmail();
-                    }
-                }
-                 
-            }
-            catch (Exception e) {
-                Log.LogError(e.ToString(), "OrderImportService.SendErrorEmails");
-            }
-        }
-
-        private string GetConfigProperty(string psProperty)
-        {
-            string lsResult = "";
-            using (DataModel.SCT db = new DataModel.SCT())
-            {
-                SiteConfig sc = db.SiteConfigs.First(s => s.ConfigValue == psProperty);
-                if (sc != null)
-                {
-                    lsResult = GetString(sc.ConfigValue);
-                }
-            }
-
-            return lsResult;    
-           
-
-        }
-
-        private string GetString(object poValue)
-        {
-            if (poValue == null || poValue.Equals(DBNull.Value))
-                return ""; 
-            else
-                return poValue.ToString();
-        }
-
-        private string AppSettingValue(string psKey)
-        {
-            string lsResult = "";
-            AppSettingsReader asr = new AppSettingsReader();
-            {
-
-                if (asr.GetValue(psKey, Type.GetType("System.String")) != null)
-                {
-                    lsResult = asr.GetValue(psKey, Type.GetType("System.String")).ToString();
-                }
-
-            }
-
-            return lsResult;
-        }
+       
     }
 
    
