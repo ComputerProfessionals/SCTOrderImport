@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Mail;
+using System.IO;
 
 namespace OrderImportClasses
 {
@@ -64,23 +65,17 @@ namespace OrderImportClasses
 
                 {
 
-                    if (System.IO.File.Exists(filePath))
+                    if (File.Exists(filePath))
 
                     {
-
                         Attachment attachment;
-
                         attachment = new Attachment(filePath);
-
                         mailObj.Attachments.Add(attachment);
-
                     }
 
                 }
 
             mailObj.IsBodyHtml = true;
-
-
 
             mailObj.Priority = MailPriority.Normal;
 
@@ -88,21 +83,20 @@ namespace OrderImportClasses
 
             SMTPServer.UseDefaultCredentials = false;
 
-            SMTPServer.Port = SMTPPort;
+            //SMTPServer.Port = SMTPPort;
 
             SMTPServer.Credentials = new System.Net.NetworkCredential(SMTPEmail, SMTPPassword);
 
-            SMTPServer.EnableSsl = true;
+            //SMTPServer.EnableSsl = true;
+
+            SMTPServer.EnableSsl = false;
 
             SMTPServer.Send(mailObj);
-
-
 
             return true;
 
         }
 
     }
-
 
 }
