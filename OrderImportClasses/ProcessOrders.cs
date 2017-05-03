@@ -13,23 +13,7 @@ using DataModel;
 namespace OrderImportClasses
 {
     public class ProcessOrders
-    {
-
-        string GetString(Object value)
-        {
-            if (value != null && value != DBNull.Value)
-                return value.ToString();
-            else
-                return "";
-        }
-
-        decimal GetDecimal(Object value)
-        {
-            if (value != null && value != DBNull.Value)
-                return (decimal)(value);
-            else
-                return 0;
-        }
+    {       
 
         private string GetTimeCode(string psTime)
         {
@@ -61,8 +45,8 @@ namespace OrderImportClasses
 
             {               
 
-                string strUserName = GetString(ConfigurationManager.AppSettings["SAPUserName"]);
-                string strPassword = GetString(ConfigurationManager.AppSettings["SAPUserPassword"]);
+                string strUserName = Util.GetString(ConfigurationManager.AppSettings["SAPUserName"]);
+                string strPassword = Util.GetString(ConfigurationManager.AppSettings["SAPUserPassword"]);
 
                 if (strUserName == "")
                     strUserName = "TEST_SL.PRTL";
@@ -100,7 +84,7 @@ namespace OrderImportClasses
 
                         if (!ProcessHeader(ws, h.ShipReqID, out lsMessage))
                         {
-                            SendErrorEmails(lsMessage);
+                            SendErrorEmails(lsMessage, h);
                             lbResult = false;
 
                         }
@@ -155,46 +139,46 @@ namespace OrderImportClasses
                     so.IS_SO_HEADER = new ZSD_WEB_SO_HEADER_S();
 
                     ZSD_WEB_SO_HEADER_S header = so.IS_SO_HEADER;
-                    header.BSTKD = GetString(h.CustomerPONum);
-                    header.BSTKD_E = GetString(h.ConsignmentRef);
-                    header.TEMP = GetString(h.TemperatureID);
-                    header.TRATY = GetString(h.MeansOfTransportID);
-                    header.KUNAG = GetString(h.CustomerAccountID);
-                    header.SHIPFR = GetString(h.PickupFromID);
-                    header.BSTDK = GetString(h.PickupDate.ToString("yyyy-MM-dd"));
-                    header.PICKUP = GetTimeCode(GetString(h.PickupTime));
+                    header.BSTKD = Util.GetString(h.CustomerPONum);
+                    header.BSTKD_E = Util.GetString(h.ConsignmentRef);
+                    header.TEMP = Util.GetString(h.TemperatureID);
+                    header.TRATY = Util.GetString(h.MeansOfTransportID);
+                    header.KUNAG = Util.GetString(h.CustomerAccountID);
+                    header.SHIPFR = Util.GetString(h.PickupFromID);
+                    header.BSTDK = Util.GetString(h.PickupDate.ToString("yyyy-MM-dd"));
+                    header.PICKUP = GetTimeCode(Util.GetString(h.PickupTime));
 
                     if (header.PICKUP == "")
                     {
-                        lsMessage = "Unable to resolve PICKUP time code for " + GetString(h.PickupTime);
+                        lsMessage = "Unable to resolve PICKUP time code for " + Util.GetString(h.PickupTime);
                         Log.LogError(lsMessage, "OrderImportClasses.ProcessOrder", piShipReqID);
                         return false;
                     }
 
-                    header.SHIPTO = GetString(h.DeliverToID);
-                    header.VDATU = GetString(h.DeliveryDate.ToString("yyyy-MM-dd"));
-                    header.DELCO = GetTimeCode(GetString(h.DeliveryTime));
+                    header.SHIPTO = Util.GetString(h.DeliverToID);
+                    header.VDATU = Util.GetString(h.DeliveryDate.ToString("yyyy-MM-dd"));
+                    header.DELCO = GetTimeCode(Util.GetString(h.DeliveryTime));
 
                     if (header.DELCO == "")
                     {
-                        psMessage = "Unable to resolve DELCO time code for " + GetString(h.PickupTime);
+                        psMessage = "Unable to resolve DELCO time code for " + Util.GetString(h.PickupTime);
                         Log.LogError(psMessage, "OrderImportClasses.ProcessOrder", piShipReqID);
                         return false;
                     }
 
-                    header.DELIV_INSTR = GetString(h.DeliveryInstructions);
+                    header.DELIV_INSTR = Util.GetString(h.DeliveryInstructions);
 
                     List<ZSD_WEB_SO_ITEM_S> items = new List<ZSD_WEB_SO_ITEM_S>();
 
                     foreach (ShippingRequestDetail i in itemList)
                     {
                         ZSD_WEB_SO_ITEM_S item = new ZSD_WEB_SO_ITEM_S();
-                        item.BRGEW = GetDecimal(i.GrossWeight);
-                        item.KWMENG = GetDecimal(i.Quantity);
-                        item.MATNR = GetString(i.MaterialNumber);
-                        item.MEINS = GetString(i.UnitOfMeasure);
-                        item.NTGEW = GetDecimal(i.NetWeight);
-                        item.VOLUM = GetDecimal(i.Volume);
+                        item.BRGEW = Util.GetDecimal(i.GrossWeight);
+                        item.KWMENG = Util.GetDecimal(i.Quantity);
+                        item.MATNR = Util.GetString(i.MaterialNumber);
+                        item.MEINS = Util.GetString(i.UnitOfMeasure);
+                        item.NTGEW = Util.GetDecimal(i.NetWeight);
+                        item.VOLUM = Util.GetDecimal(i.Volume);
                         items.Add(item);
                     }
 
@@ -329,28 +313,29 @@ namespace OrderImportClasses
             }
         }
 
-        public void SendErrorEmails(string psMessage)
+        public void SendErrorEmails(string psMessage, ShippingRequestHeader poH)
         {
             try
             {
 
 
-                string lsRecipients = AppSettingValue("ErrorRecipients");
+                string lsRecipients = Util.AppSettingValue("ErrorRecipients");
 
-                string lsBody = "<div style='font-family:arial;font-size:10pt'>" +
-                                "<div style='font-size:13pt;'>" +
-                                    "The following error occurred when attempting to save an online customer order:" +
-                                "</div>" +
-                                "<div style='padding:20px;'>" + psMessage + "</div>" +
-                            "</div>";
+                string lsBody = 
+                        "<table style='width:100%;font-size:10pt;font-family:arial'>" +  
+                                    "<tr><td colspan=2 style='padding:5px;font-weight:bold'>An error occurred when attempting to save an online customer order</td></tr>" +                                
+                                    "<tr><td style='width:20%;padding:5px'>Customer Account #:</td><td style='width:80%;padding:5px'>" + poH.CustomerAccountID  + "</td></tr>" +
+                                    "<tr><td style='padding:5px;width:20%'>Order #:</td><td style='padding:5px'>" + poH.CustomerPONum + "</td></tr>" + 
+                                    "<tr><td style='padding:5px;width:20%'>Error:</td><td style='padding:5px'>" + psMessage + "</td></tr>" +
+                                    "<tr><td style='padding:5px;width:20%'>Shipping Request ID:</td><td style='padding:5px'>" + poH.ShipReqID.ToString() + "</td></tr>" +
+                            "</table>";
 
-                string lsSubject = AppSettingValue("ErrorSubject");
+                string lsSubject = Util.AppSettingValue("ErrorSubject");
 
                 foreach (string lsTo in lsRecipients.Split(';'))
                 {
                     if (lsTo.Trim() != "" && lsTo.IndexOf("@") > -1)
                     {
-
                         MailHelper mh = new MailHelper();
 
                         mh.Body = lsBody;
@@ -388,36 +373,17 @@ namespace OrderImportClasses
                     SiteConfig sc = db.SiteConfigs.First(s => s.ConfigItem == psProperty);
                     if (sc != null)
                     {
-                        lsResult = GetString(sc.ConfigValue);
+                        lsResult = Util.GetString(sc.ConfigValue);
                     }
                 }
             }
             catch(Exception ex)
             {
                 Log.LogError(ex.ToString(), "ProcessOrders.GetConfigProperty");
-            }
-           
+            }           
 
             return lsResult;
-
-
-        }      
-
-        private string AppSettingValue(string psKey)
-        {
-            string lsResult = "";
-            AppSettingsReader asr = new AppSettingsReader();
-            {
-
-                if (asr.GetValue(psKey, Type.GetType("System.String")) != null)
-                {
-                    lsResult = asr.GetValue(psKey, Type.GetType("System.String")).ToString();
-                }
-
-            }
-
-            return lsResult;
-        }
+        }  
 
     }
 }
