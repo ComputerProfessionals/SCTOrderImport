@@ -31,7 +31,7 @@
             // 
             // OrderImport
             // 
-            this.ServiceName = "Service1";
+            this.ServiceName = "OrderImportService";
 
         }
 

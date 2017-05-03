@@ -16,81 +16,72 @@ namespace OrderImportService
 {
     public partial class OrderImport : ServiceBase
     {
-        System.Timers.Timer timer;
+        System.Threading.Timer timer;
         bool polling = false;
+      
         public OrderImport()
         {
-            try {
-                InitializeComponent();
-            } catch(Exception e)
-            {
-                Log.LogError(e.ToString(), "OrderImport.OrderImport");
-            }
-           
+            InitializeComponent();
         }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+            Console.WriteLine("MyHandler caught : " + e.Message);
+            Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
+            Log.LogErrorRaw(e.Message, "OrderImportService");
+        }
+
 
         protected override void OnStart(string[] args)
         {
-            try {
 
-                AppDomain.CurrentDomain.UnhandledException += errHandler;
-
-
-              //  Log.LogError("Service Starting", "OrderimportService.OnStart");
-                double liInt = 5000;
-
-                object value = System.Configuration.ConfigurationManager.AppSettings["TimerInterval"];
-
-                if (value != null)
-                    double.TryParse(value.ToString(), out liInt);
-
-                timer = new System.Timers.Timer(liInt);
-
-                // Log.LogError("Timer interval = " + liInt.ToString(), "OrderimportService.OnStart");
-
-                timer.Enabled = true;
-                timer.Elapsed += DoPoll;               
-                timer.Start();
-
-                //Log.LogError("Timer started", "OrderimportService.OnStart");
-
-            } catch(Exception e) {
-                Log.LogError(e.ToString(), "OrderImportService.OnStart");
-            }
+            Start();
             
-        }  
+        } 
         
-        private void errHandler(object sender, UnhandledExceptionEventArgs e)
+        private void Start()
         {
-            Exception ex = (Exception)e.ExceptionObject;
-            try
-            {
-                Log.LogError(ex.ToString(), "OrderImportService.UnhandledException");
-            }
-            catch (Exception ex1) {
 
-            }
-        }     
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+
+            int liInt = 5000;
+
+            object value = System.Configuration.ConfigurationManager.AppSettings["TimerInterval"];
+
+            if (value != null)
+                Int32.TryParse(value.ToString(), out liInt);
+
+            TimeSpan tsInterval = new TimeSpan(0, 0, liInt);
+            timer = new System.Threading.Timer(new System.Threading.TimerCallback(DoPoll) , null, tsInterval, tsInterval); 
+        }        
+      
 
         protected override void OnStop()
-        {
-           // Log.LogError("Service Stopping", "OrderimportService.OnStop");            
-            timer.Dispose();
+        {                                  
+            timer.Dispose();           
         }      
 
-        private void DoPoll(object sender, EventArgs e)
+        private void DoPoll(object state)
         {
-            //  Log.LogError("Enter DoPoll", "OrderImportService.DoPoll");
+           
             bool started = false;
 
             try
             {
+                
+                if (Util.GetBoolean(Util.AppSettingValue("DebugMessages")))
+                    Log.LogError("Enter DoPoll", "OrderImportService.DoPoll");
+
                 if (!polling)
                 {
 
-                    polling = true;
                     started = true;
-                  //  Log.LogError("Call ProcessOrder()", "OrderImportService.DoPoll");
+                    polling = true;
+
+                    if (Util.GetBoolean(Util.AppSettingValue("DebugMessages")))
+                        Log.LogError("Call ProcessOrders.Process()", "OrderImportService.DoPoll", 0);
+
                     ProcessOrders loPO = new ProcessOrders();
                     string lsMessage = "";
                     bool lbResult = loPO.Process(out lsMessage);
@@ -100,16 +91,14 @@ namespace OrderImportService
             }
             catch (Exception ex)
             {
-                Log.LogError(ex.ToString(), "OrderImportService.DoPoll");
+                Log.LogError(ex.ToString(), "OrderImportService.DoPoll", 0);
             }
             finally {
                 if (started==true && polling==true)
                     polling = false;
             }
-        }       
-
+        } 
        
     }
-
    
 }
