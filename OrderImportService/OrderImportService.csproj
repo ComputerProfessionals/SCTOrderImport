@@ -101,6 +101,8 @@
     <Content Include="bin\OrderImportService.exe" />
     <Content Include="bin\OrderImportService.pdb" />
     <Content Include="bin\OrderImportService.vshost.exe" />
+    <Content Include="emailtemplate.sql" />
+    <Content Include="ErrorEmailTemplate.htm" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
