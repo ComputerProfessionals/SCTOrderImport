@@ -15,7 +15,7 @@ namespace OrderImportClasses
     public class ProcessOrders
     {       
 
-        private string GetTimeCode(string psTime)
+        private string GetTimeCode(string psTime, bool isDel = false)
         {
             string lsCode = "";
             using (SCT db = new SCT())
@@ -24,7 +24,11 @@ namespace OrderImportClasses
 
                 if (tcm != null)
                 {
-                    lsCode = tcm.TimeCode.GetValueOrDefault(0).ToString();
+                    if (isDel)
+                        lsCode = tcm.TimeCode_DEL.GetValueOrDefault(0).ToString();
+                    else
+                        lsCode = tcm.TimeCode.GetValueOrDefault(0).ToString();
+
                     if (lsCode.Length < 2)
                         lsCode = "0" + lsCode;
                 }
@@ -146,7 +150,7 @@ namespace OrderImportClasses
                     header.KUNAG = Util.GetString(h.CustomerAccountID);
                     header.SHIPFR = Util.GetString(h.PickupFromID);
                     header.BSTDK = Util.GetString(h.PickupDate.ToString("yyyy-MM-dd"));
-                    header.PICKUP = GetTimeCode(Util.GetString(h.PickupTime));
+                    header.PICKUP = GetTimeCode(Util.GetString(h.PickupTime), false);
 
                     if (header.PICKUP == "")
                     {
@@ -157,11 +161,11 @@ namespace OrderImportClasses
 
                     header.SHIPTO = Util.GetString(h.DeliverToID);
                     header.VDATU = Util.GetString(h.DeliveryDate.ToString("yyyy-MM-dd"));
-                    header.DELCO = GetTimeCode(Util.GetString(h.DeliveryTime));
+                    header.DELCO = GetTimeCode(Util.GetString(h.DeliveryTime), true);
 
                     if (header.DELCO == "")
                     {
-                        psMessage = "Unable to resolve DELCO time code for " + Util.GetString(h.PickupTime);
+                        psMessage = "Unable to resolve DELCO time code for " + Util.GetString(h.DeliveryTime);
                         Log.LogError(psMessage, "OrderImportClasses.ProcessOrder", piShipReqID);
                         return false;
                     }
@@ -322,13 +326,26 @@ namespace OrderImportClasses
                 string lsRecipients = Util.AppSettingValue("ErrorRecipients");
 
                 string lsBody = 
-                        "<table style='width:100%;font-size:10pt;font-family:arial'>" +  
-                                    "<tr><td colspan=2 style='padding:5px;font-weight:bold'>An error occurred when attempting to save an online customer order</td></tr>" +                                
-                                    "<tr><td style='width:20%;padding:5px'>Customer Account #:</td><td style='width:80%;padding:5px'>" + poH.CustomerAccountID  + "</td></tr>" +
-                                    "<tr><td style='padding:5px;width:20%'>Order #:</td><td style='padding:5px'>" + poH.CustomerPONum + "</td></tr>" + 
-                                    "<tr><td style='padding:5px;width:20%'>Error:</td><td style='padding:5px'>" + psMessage + "</td></tr>" +
-                                    "<tr><td style='padding:5px;width:20%'>Shipping Request ID:</td><td style='padding:5px'>" + poH.ShipReqID.ToString() + "</td></tr>" +
-                            "</table>";
+                    "<div style='font-size:10pt;font-family:arial;padding-bottom:5px;'>The following error occurred when attempting to save an online customer order:</div><hr/>" +
+                    "<table style='width:100%;font-size:10pt;font-family:arial'>" +                                                                  
+                        "<tr>" + 
+                            "<td style='width:10%;padding:5px;font-weight:bold'>Customer Account #:</td>" + 
+                            "<td style='width:90%;padding:5px'>" + poH.CustomerAccountID  + "</td>" + 
+                        "</tr>" +
+                        "<tr>" + 
+                            "<td style='padding:5px;width:10%;font-weight:bold'>Order #:</td>" + 
+                            "<td style='padding:5px;width:90%'>" + poH.CustomerPONum + "</td>" + 
+                        "</tr>" +
+                        "<tr>" + 
+                            "<td style='padding:5px;width:10%;font-weight:bold'>Error:</td>" + 
+                            "<td style='padding:5px;width:90%'>" + psMessage + "</td>" + 
+                        "</tr>" +
+                        "<tr>" + 
+                            "<td style='padding:5px;width:10%;font-weight:bold'>Shipping Request ID:</td>" + 
+                            "<td style='padding:5px;width:90%'>" + poH.ShipReqID.ToString() + "</td>" + 
+                        "</tr>" +
+                        "</table>" + 
+                        "<hr/>";
 
                 string lsSubject = Util.AppSettingValue("ErrorSubject");
 
